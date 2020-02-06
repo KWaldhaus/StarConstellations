@@ -2,99 +2,44 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
+using DefaultNamespace;
 using UnityEngine;
 
 public class DataReader
 {
-	public List<string> ReadFile(string path)
+	private const string FileName = "hip_main.dat";
+	private readonly string _path = Application.dataPath + "/Resources/" + FileName;
+	private DataParser _dataParser;
+	private List<StarDataStruct> _starDataStructs;
+
+	public DataReader()
 	{
-		if (!File.Exists(path))
+		_dataParser = new DataParser();
+		_starDataStructs = new List<StarDataStruct>();
+	}
+
+	public List<StarDataStruct> ReadFile()
+	{
+		Debug.Log("Loading File from: " + _path);
+		if (!File.Exists(_path))
 		{
+			Debug.Log("Loading File failed.");
 			return null;
 		}
 
-		var starDataList = new List<string>();
-		using (var reader = new StreamReader(File.Open(path, FileMode.Open)))
+		using (var streamReader = new StreamReader(File.Open(_path, FileMode.Open)))
 		{
-			while (reader.Peek() >= 0)
-			{
-				starDataList.Add(reader.ReadLine());
-			}
-		}
-		//return starDataList;
-
-
-		//using (var memoryStream = new MemoryStream(message))
-		using (var streamReader = new StreamReader(File.Open(path, FileMode.Open)))
-		{
-
-			bool shouldParseHeader = true;
 			string line;
-
 			while ((line = streamReader.ReadLine()) != null)
 			{
-				if (shouldParseHeader)
+				var dataStruct = _dataParser.ParseData(line);
+				if (dataStruct.HasPosition)
 				{
-					ParseFrameHeader(line);
-
-					// headers are separated from the body by an empty line
-					shouldParseHeader = !string.IsNullOrEmpty(line);
-				}
-				else if (ParseFrameBody(messageBody, line))
-				{
-					// stop reading the body if reached the final of it
-					break;
+					_starDataStructs.Add(dataStruct);
 				}
 			}
 		}
 
-		return null;
-	}
-
-
-	private void ParseFrameHeader(string messageLine)
-	{
-		string headerKey;
-		string headerValue;
-		if (!TryParseMessageHeaders(messageLine, out headerKey, out headerValue))
-		{
-			return;
-		}
-
-		if (!Headers.ContainsKey(headerKey))
-		{
-			this[headerKey] = headerValue;
-		}
-	}
-
-	/// <returns>true if is the end of the message frame</returns>
-	private bool ParseFrameBody(StringBuilder builder, string messageLine)
-	{
-		// check if this is the final line ending with an \0
-		if (messageLine.Length > 0 && messageLine[messageLine.Length - 1] == '\0')
-		{
-			builder.Append(messageLine.Substring(0, messageLine.Length - 1));
-			return true;
-		}
-
-		builder.AppendLine(messageLine);
-		return false;
-	}
-
-	private bool TryParseMessageHeaders(string content, out string headerKey, out string headerValue)
-	{
-		int headerSeparationIndex = content.IndexOf(':');
-
-		if (headerSeparationIndex > -1)
-		{
-		headerKey = content.Substring(0, headerSeparationIndex);
-		headerValue = content.Substring(headerSeparationIndex + 1);
-		return true;
-		}
-
-		headerValue = headerKey = null;
-		return false;
+		return _starDataStructs;
 	}
 }
-
-

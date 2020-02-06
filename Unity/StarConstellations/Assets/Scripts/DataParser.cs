@@ -1,41 +1,96 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using DefaultNamespace;
+using JetBrains.Annotations;
 using UnityEngine;
 
-public class DataParser : MonoBehaviour
+public class DataParser
 {
-	private string FileName = "hip_main";
-	private List<string> _starDataList;
-	private List<Star> _starList;
+	private const int DecDataPosition = 8;
+	private const int RaDataPosition = 9;
+	private const int MagDataPosition = 11;
+	private const int DistDataPosition = 11;
+	private string[] _starDataList;
 	private DataReader _reader;
 
-	private void Start()
+	public StarDataStruct ParseData(string line)
 	{
-		_reader = new DataReader();
-		_starList = new List<Star>();
-		_starDataList = new List<string>();
+		var data = new StarDataStruct();
+		var separatedData = line.Split('|');
 
-		string path = Application.dataPath + "/Resources/" + FileName;
-		_starDataList = _reader.ReadFile(path);
-	}
+		if (separatedData[DecDataPosition] == null ||
+		    separatedData[RaDataPosition] == null ||
+		    separatedData[DistDataPosition] == null)
+		{
+			data.HasPosition = false;
+			return data;
+		}
 
-	public void ParseRightAscension()
-	{
+		data.Declination = ParseDeclination(separatedData[DecDataPosition]);
+		data.RightAscension = ParseRightAscension(separatedData[RaDataPosition]);
+		data.Magnitude = ParseMagnitude(separatedData[MagDataPosition]);
+		data.Distance = ParseDistance(separatedData[DistDataPosition]);
+		data.HasPosition = true;
 		
+		return data;
 	}
 
-	public void ParseDeclination()
+	private float ParseRightAscension(string dataLine)
 	{
+		if (float.TryParse(dataLine, out var ra))
+		{
+			return ra;
+		}
+
+		return 0;
 	}
 
-	public void ParseDistance()
+	private float ParseDeclination(string dataLine)
 	{
+		if (!float.TryParse(dataLine, out var dec))
+			return 0;
+		if (dec < 0)
+		{
+			dec = (dec * -1) + 90;
+		}
+		else
+		{
+			dec = 90 - dec;
+		}
+
+		return dec;
 	}
 
-	public void ParseMagnitude()
+	private float ParseDistance(string dataLine)
 	{
+		if (float.TryParse(dataLine, out var distance))
+		{
+			if(distance > 0)
+			{
+				distance = 1/(distance/1000);
+			}
+			else
+			{
+				distance = 0;
+			}
+		}
+
+		return distance;
 	}
 
-	public void ParseStarColour()
+	private float ParseMagnitude(string dataLine)
 	{
+		if (float.TryParse(dataLine, out var magnitude))
+		{
+			return magnitude;
+		}
+
+		return 0;
+	}
+
+	public Color ParseStarColour()
+	{
+		//todo look for conversion to color
+		return new Color();
 	}
 }
