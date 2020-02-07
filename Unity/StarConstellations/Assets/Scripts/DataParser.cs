@@ -6,10 +6,15 @@ using UnityEngine;
 
 public class DataParser
 {
-	private const int DecDataPosition = 8;
-	private const int RaDataPosition = 9;
-	private const int MagDataPosition = 11;
-	private const int DistDataPosition = 11;
+	//Adjustments
+	private const int MinDistance = 50;
+	private const int DistanceMultiplier = 2;
+	//Catalogue data positions
+	private const int MagDataPosition = 5;
+	private const int RaDataPosition = 8;
+	private const int DecDataPosition = 9;
+	private const int ParallaxDataPosition = 11;
+	
 	private string[] _starDataList;
 	private DataReader _reader;
 
@@ -20,7 +25,7 @@ public class DataParser
 
 		if (separatedData[DecDataPosition] == null ||
 		    separatedData[RaDataPosition] == null ||
-		    separatedData[DistDataPosition] == null)
+		    separatedData[ParallaxDataPosition] == null)
 		{
 			data.HasPosition = false;
 			return data;
@@ -29,35 +34,29 @@ public class DataParser
 		data.Declination = ParseDeclination(separatedData[DecDataPosition]);
 		data.RightAscension = ParseRightAscension(separatedData[RaDataPosition]);
 		data.Magnitude = ParseMagnitude(separatedData[MagDataPosition]);
-		data.Distance = ParseDistance(separatedData[DistDataPosition]);
+		data.Distance = ParseDistance(separatedData[ParallaxDataPosition]);
+		data.Position = CalcPosition(data);
 		data.HasPosition = true;
-		
+
+
 		return data;
 	}
 
 	private float ParseRightAscension(string dataLine)
 	{
-		if (float.TryParse(dataLine, out var ra))
+		if (!float.TryParse(dataLine, out var ra))
 		{
-			return ra;
+			return 0;
 		}
-
-		return 0;
+		Debug.Log(ra);
+		return ra;
 	}
 
 	private float ParseDeclination(string dataLine)
 	{
 		if (!float.TryParse(dataLine, out var dec))
 			return 0;
-		if (dec < 0)
-		{
-			dec = (dec * -1) + 90;
-		}
-		else
-		{
-			dec = 90 - dec;
-		}
-
+		dec = +90;
 		return dec;
 	}
 
@@ -65,9 +64,9 @@ public class DataParser
 	{
 		if (float.TryParse(dataLine, out var distance))
 		{
-			if(distance > 0)
+			if (distance > 0)
 			{
-				distance = 1/(distance/1000);
+				distance = 1 / (distance / 1000);
 			}
 			else
 			{
@@ -86,6 +85,33 @@ public class DataParser
 		}
 
 		return 0;
+	}
+
+	private Vector3 CalcPosition(StarDataStruct star)
+	{
+		//in radians
+		// var x = DistanceMultiplier *
+		//         star.Distance *
+		//         Mathf.Sin(f: Mathf.Deg2Rad * star.Declination) *
+		//         Mathf.Cos(Mathf.Deg2Rad * star.RightAscension);
+		// var y = DistanceMultiplier *
+		//         star.Distance *
+		//         Mathf.Sin(f: Mathf.Deg2Rad * star.Declination) *
+		//         Mathf.Sin(Mathf.Deg2Rad * star.RightAscension);
+		// var z = DistanceMultiplier * star.Distance * 
+		//         Mathf.Cos(Mathf.Deg2Rad * star.Declination);
+
+		//In degrees
+		var x = (MinDistance + DistanceMultiplier * star.Distance) *
+		        Mathf.Sin(star.Declination) *
+		        Mathf.Cos(star.RightAscension);
+		var y = (MinDistance + DistanceMultiplier * star.Distance) *
+		        Mathf.Sin(star.Declination) *
+		        Mathf.Sin(star.RightAscension);
+		var z = (MinDistance + DistanceMultiplier * star.Distance) *
+		        Mathf.Cos(star.Declination);
+
+		return new Vector3(x, y, z);
 	}
 
 	public Color ParseStarColour()

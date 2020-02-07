@@ -8,7 +8,6 @@
           <e p="DataParser.cs" t="Include" />
           <e p="DataReader.cs" t="Include" />
           <e p="InitialiseData.cs" t="Include" />
-          <e p="StarData.cs" t="Include" />
           <e p="StarDataStruct.cs" t="Include" />
         </e>
       </e>
