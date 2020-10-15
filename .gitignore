@@ -149,3 +149,5 @@ sysinfo.txt
 
 
 # End of https://www.gitignore.io/api/rider,unity,processing
+Unity/StarConstellations/Library/
+Unity/StarConstellations/Temp/
