@@ -242,7 +242,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b1c1f5d257b44b5a1838d4a1b6ae82f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  starPrefab: {fileID: 5299524712161156317, guid: 220c61884659d46d78a68017bae031c5,
+  starPrefab: {fileID: 4209649020392917904, guid: 617cbd178796efb4194052dce8a501eb,
     type: 3}
   starAmount: 0
 --- !u!4 &1077582054
@@ -294,8 +294,8 @@ Camera:
   m_GameObject: {fileID: 1322966235}
   m_Enabled: 1
   serializedVersion: 2
-  m_ClearFlags: 1
-  m_BackGroundColor: {r: 0.19215687, g: 0.3019608, b: 0.4745098, a: 0}
+  m_ClearFlags: 2
+  m_BackGroundColor: {r: 0, g: 0, b: 0, a: 0}
   m_projectionMatrixMode: 1
   m_GateFitMode: 2
   m_FOVAxisMode: 0

@@ -11,6 +11,7 @@ namespace DefaultNamespace
         public GameObject starPrefab;
         public int starAmount;
 
+        Entity starEntitiy;
         private EntityManager entityManager;
         private List<StarDataStruct> _starDataStructs = new List<StarDataStruct>();
 
@@ -21,18 +22,16 @@ namespace DefaultNamespace
 
             SpawnStars();
             World world = World.DefaultGameObjectInjectionWorld;
-            EntityManager entityManager = world.EntityManager;
+            entityManager = world.EntityManager;
+            GameObjectConversionSettings settings = new GameObjectConversionSettings(world, GameObjectConversionUtility.ConversionFlags.AssignName);
+            starEntitiy = GameObjectConversionUtility.ConvertGameObjectHierarchy(starPrefab, settings);
         }
 
         private void SpawnStars()
         {
             for (int i = 0; i < _starDataStructs.Count; i++)
             {
-                var star = entityManager.Instantiate(starPrefab);
-
-                var distance = new Distance();
-                distance.Value = 1;
-
+                var star = entityManager.Instantiate(starEntitiy);
                 AddComponentData(star, _starDataStructs[i]);
             }
         }
