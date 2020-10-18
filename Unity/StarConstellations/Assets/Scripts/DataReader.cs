@@ -16,7 +16,7 @@ public class DataReader
 		_dataParser = new DataParser();
 	}
 
-	public List<StarDataStruct> ReadFile()
+    public List<StarDataStruct> ReadFile()
 	{
         var _starDataStructs = new List<StarDataStruct>();
         Debug.Log("Loading File from: " + _path);
@@ -35,12 +35,10 @@ public class DataReader
 				var dataStruct = _dataParser.ParseData(line);
 				if (dataStruct.HasPosition)
 				{
-                    
                     _starDataStructs.Add(dataStruct);
 				}
 			}
 		}
-
 		return _starDataStructs;
 	}
 }

@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using Unity.Entities;
+using Unity.Mathematics;
+using Unity.Transforms;
 using UnityEngine;
 
 namespace DefaultNamespace
@@ -16,6 +18,7 @@ namespace DefaultNamespace
         {
             DataReader dataReader = new DataReader();
             _starDataStructs = dataReader.ReadFile();
+
             SpawnStars();
             World world = World.DefaultGameObjectInjectionWorld;
             EntityManager entityManager = world.EntityManager;
@@ -23,11 +26,28 @@ namespace DefaultNamespace
 
         private void SpawnStars()
         {
-            //foreach (var starDataStruct in _starDataStructs)
-            for (int i = 0; i < _starDataStructs.Count / 100; i++)
+            for (int i = 0; i < _starDataStructs.Count; i++)
             {
                 var star = entityManager.Instantiate(starPrefab);
+
+                var distance = new Distance();
+                distance.Value = 1;
+
+                AddComponentData(star, _starDataStructs[i]);
             }
+        }
+
+        private void AddComponentData(Entity star, StarDataStruct starData) {
+
+            var position = new Translation();
+            position.Value = starData.Position.Value;
+            entityManager.AddComponentData<Translation>(star, position);
+
+            entityManager.AddComponentData<Distance>(star, starData.Distance);
+            entityManager.AddComponentData<RightAscension>(star, starData.RightAscension);
+            entityManager.AddComponentData<Declination>(star, starData.Declination);
+            entityManager.AddComponentData<Magnitude>(star, starData.Magnitude);
+            
         }
     }
 }

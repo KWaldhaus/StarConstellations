@@ -1,14 +1,11 @@
 using UnityEngine;
 
-namespace DefaultNamespace
-{
 	public struct StarDataStruct
 	{
-		public float RightAscension;
-		public float Declination;
-		public float Magnitude;
-		public float Distance;
-		public Vector3 Position;
+		public RightAscension RightAscension;
+		public Declination Declination;
+		public Magnitude Magnitude;
+		public Distance Distance;
+		public StarPosition Position;
 		public bool HasPosition;
 	}
-}
